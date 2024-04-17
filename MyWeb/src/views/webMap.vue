@@ -121,9 +121,9 @@ onMounted(() => {
   map.addControl(zoom)
   map.addControl(zoomSlider)
   map.addControl(zoomToExtent)
-
   // 控件添加到地图
   map.addControl(miniMap)
+
   // 3.5-创建完毕后触发事件
   window.map = map
   // 3.4-触发创建完毕的事件，传回地图实例对象
@@ -133,6 +133,10 @@ onMounted(() => {
 
 <template>
   <div id="mapDom" class="map"></div>
+  <div class="control">
+    <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
+    <el-button @click="onRestore('bar')">复位</el-button>
+  </div>
 </template>
 
 <style>
@@ -149,5 +153,11 @@ onMounted(() => {
   bottom: 5px;
   right: 8px;
   color: rgb(0, 0, 0);
+}
+
+.control {
+  position: absolute;
+  left: 80px;
+  top: 10px;
 }
 </style>
