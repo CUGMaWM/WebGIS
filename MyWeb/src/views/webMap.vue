@@ -3,6 +3,11 @@ import Map from 'ol/Map.js'
 import View from 'ol/View.js'
 import TileLayer from 'ol/layer/Tile.js'
 import XYZ from 'ol/source/XYZ.js'
+import MousePosition from 'ol/control/MousePosition.js'
+import OverviewMap from 'ol/control/OverviewMap.js'
+import Zoom from 'ol/control/Zoom.js'
+import ZoomSlider from 'ol/control/ZoomSlider.js'
+import ZoomToExtent from 'ol/control/ZoomToExtent.js'
 
 import { onMounted } from 'vue'
 
@@ -87,6 +92,39 @@ onMounted(() => {
         })
       })
   })
+
+  //！！！
+  //此处开始为地图添加控件
+  //！！！
+
+  // 1.创建鼠标位置控件
+  const control = new MousePosition({ className: 'mousPos' })
+  // 控件添加到地图
+  map.addControl(control)
+
+  //2.地图鹰眼
+  const baseLayer = map.getLayers().item(0)
+  // 创建鹰眼控件
+  const miniMap = new OverviewMap({
+    collapsed: false,
+    layers: [new TileLayer({ source: baseLayer.getSource() })]
+  })
+
+  //3.地图缩放
+  // 创建缩放按钮控件
+  const zoom = new Zoom()
+  // 创建缩放滑块控件
+  const zoomSlider = new ZoomSlider()
+  // 创建缩放到范围，默认使用view的投影范围
+  const zoomToExtent = new ZoomToExtent()
+  // 缩放控件添加到地图
+  map.addControl(zoom)
+  map.addControl(zoomSlider)
+  map.addControl(zoomToExtent)
+
+  // 控件添加到地图
+  map.addControl(miniMap)
+  // 3.5-创建完毕后触发事件
   window.map = map
   // 3.4-触发创建完毕的事件，传回地图实例对象
   emit('created', map)
@@ -104,5 +142,12 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.mousPos {
+  position: absolute;
+  bottom: 5px;
+  right: 8px;
+  color: rgb(0, 0, 0);
 }
 </style>
