@@ -8,6 +8,7 @@ import OverviewMap from 'ol/control/OverviewMap.js'
 import Zoom from 'ol/control/Zoom.js'
 import ZoomSlider from 'ol/control/ZoomSlider.js'
 import ZoomToExtent from 'ol/control/ZoomToExtent.js'
+import ScaleLine from 'ol/control/ScaleLine.js'
 
 import { onMounted } from 'vue'
 
@@ -124,11 +125,68 @@ onMounted(() => {
   // 控件添加到地图
   map.addControl(miniMap)
 
+  //4.比例尺
+  let scale = null
+  // 移除旧比例尺
+  scale && map.removeControl(scale)
+  // 创建新比例尺
+  scale = new ScaleLine('bar')
+  // 添加到地图
+  map.addControl(scale)
+
   // 3.5-创建完毕后触发事件
   window.map = map
   // 3.4-触发创建完毕的事件，传回地图实例对象
   emit('created', map)
 })
+
+//此处作按钮控制
+//必要参数
+let mainMap = null
+let view = null
+let zoom = null
+let center = null
+let rotation = null
+
+setTimeout(() => {
+  mainMap = window.map
+  view = mainMap.getView()
+  console.log(view)
+  // 记录初始状态
+  zoom = view.getZoom()
+  center = view.getCenter()
+  rotation = view.getRotation()
+}, 1000)
+
+//3.移位控制
+
+// 移动到武汉
+const onMoveWh = () => {
+  view = window.map.getView()
+  if (!view) return
+  view.setCenter([114.31667, 30.51667])
+  view.setZoom(12)
+}
+// 复位
+const onRestore = () => {
+  if (!view) return
+  view.setZoom(zoom)
+  view.setCenter(center)
+  view.setRotation(rotation)
+}
+
+//4.响应比例尺控制条
+const onScaleChange = (type) => {
+  if (!window.map) return
+  let olmap = window.map
+  let scale = null
+  // 移除旧比例尺
+  scale && olmap.removeControl(scale)
+  // 创建新比例尺
+  scale = new ScaleLine({ bar: type === 'bar' })
+  // 添加到地图
+  olmap.addControl(scale)
+}
 </script>
 
 <template>
@@ -136,6 +194,11 @@ onMounted(() => {
   <div class="control">
     <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
     <el-button @click="onRestore('bar')">复位</el-button>
+  </div>
+
+  <div class="barControl">
+    <el-button @click="onScaleChange('line')">比例尺线</el-button>
+    <el-button @click="onScaleChange('bar')">比例尺条</el-button>
   </div>
 </template>
 
@@ -158,6 +221,12 @@ onMounted(() => {
 .control {
   position: absolute;
   left: 80px;
+  top: 10px;
+}
+
+.barControl {
+  position: absolute;
+  left: 280px;
   top: 10px;
 }
 </style>
