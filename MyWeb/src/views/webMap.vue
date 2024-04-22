@@ -141,13 +141,14 @@ onMounted(() => {
 })
 
 //此处作按钮控制
-//必要参数
+//1.必要参数
 let mainMap = null
 let view = null
 let zoom = null
 let center = null
 let rotation = null
 
+//2.阻塞进程以避免undefined
 setTimeout(() => {
   mainMap = window.map
   view = mainMap.getView()
@@ -159,12 +160,11 @@ setTimeout(() => {
 }, 1000)
 
 //3.移位控制
-
 // 移动到武汉
 const onMoveWh = () => {
   view = window.map.getView()
   if (!view) return
-  view.setCenter([114.31667, 30.51667])
+  view.setCenter([12758612.973162018, 3562849.0216611675])
   view.setZoom(12)
 }
 // 复位
@@ -187,6 +187,9 @@ const onScaleChange = (type) => {
   // 添加到地图
   olmap.addControl(scale)
 }
+
+//5.图层切换
+const layerControl = () => {}
 </script>
 
 <template>
@@ -195,10 +198,12 @@ const onScaleChange = (type) => {
     <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
     <el-button @click="onRestore('bar')">复位</el-button>
   </div>
-
   <div class="barControl">
     <el-button @click="onScaleChange('line')">比例尺线</el-button>
     <el-button @click="onScaleChange('bar')">比例尺条</el-button>
+  </div>
+  <div class="layerControl">
+    <el-button @click="layerControl()" icon="el-icon-set"></el-button>
   </div>
 </template>
 
@@ -228,5 +233,17 @@ const onScaleChange = (type) => {
   position: absolute;
   left: 280px;
   top: 10px;
+}
+
+.layerControl {
+  position: absolute;
+  left: 480px;
+  top: 10px;
+}
+
+.el-icon-set {
+  background: url('src/assets/setting.png') no-repeat;
+  font-size: 16px;
+  background-size: cover;
 }
 </style>
