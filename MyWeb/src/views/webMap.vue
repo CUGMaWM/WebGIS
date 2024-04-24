@@ -10,6 +10,7 @@ import ZoomSlider from 'ol/control/ZoomSlider.js'
 import ZoomToExtent from 'ol/control/ZoomToExtent.js'
 import ScaleLine from 'ol/control/ScaleLine.js'
 
+import { ref } from 'vue'
 import { onMounted } from 'vue'
 
 // 1-定义外部参数
@@ -152,7 +153,6 @@ let rotation = null
 setTimeout(() => {
   mainMap = window.map
   view = mainMap.getView()
-  console.log(view)
   // 记录初始状态
   zoom = view.getZoom()
   center = view.getCenter()
@@ -189,7 +189,44 @@ const onScaleChange = (type) => {
 }
 
 //5.图层切换
-const layerControl = () => {}
+const checks = ref([])
+
+// 图层开关控制
+const onCheckChange = () => {
+  let olmap = mainMap
+  if (!olmap) return
+  let layers = mainMap
+    .getLayers()
+    .getArray()
+    .map((layer) => {
+      checks.value.push(layer.get('name'))
+      return {
+        name: layer.get('name'),
+        title: layer.get('title'),
+        layer
+      }
+    })
+  layers.forEach((layer) => {
+    layer.layer.setVisible(checks.value.includes(layer.name))
+  })
+}
+</script>
+
+<script>
+//地图跳转
+export default {
+  methods: {
+    movePublicMap() {
+      this.$router.push({ path: '/publicMap' })
+    },
+    moveOGCMap() {
+      this.$router.push({ path: '/OGCMap' })
+    },
+    moveOSMap() {
+      this.$router.push({ path: '/OSMap' })
+    }
+  }
+}
 </script>
 
 <template>
@@ -197,14 +234,19 @@ const layerControl = () => {}
   <div class="control">
     <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
     <el-button @click="onRestore('bar')">复位</el-button>
-  </div>
-  <div class="barControl">
     <el-button @click="onScaleChange('line')">比例尺线</el-button>
     <el-button @click="onScaleChange('bar')">比例尺条</el-button>
+    <el-button @click="movePublicMap()">公开地图</el-button>
+    <el-button @click="moveOGCMap()">OGC地图</el-button>
+    <el-button @click="moveOSMap()">开源地图</el-button>
   </div>
-  <div class="layerControl">
-    <el-button @click="layerControl()" icon="el-icon-set"></el-button>
-  </div>
+  <el-card class="layerControl">
+    <el-checkbox-group v-model="checks" @change="onCheckChange">
+      <el-checkbox v-for="layer in layers" :key="layer.name" :label="layer.name">{{
+        layer.title
+      }}</el-checkbox>
+    </el-checkbox-group>
+  </el-card>
 </template>
 
 <style>
@@ -229,21 +271,10 @@ const layerControl = () => {}
   top: 10px;
 }
 
-.barControl {
-  position: absolute;
-  left: 280px;
-  top: 10px;
-}
-
 .layerControl {
   position: absolute;
-  left: 480px;
+  right: 5px;
   top: 10px;
-}
-
-.el-icon-set {
-  background: url('src/assets/setting.png') no-repeat;
-  font-size: 16px;
-  background-size: cover;
+  width: 400px;
 }
 </style>
