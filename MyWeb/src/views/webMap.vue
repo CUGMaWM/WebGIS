@@ -1,4 +1,5 @@
 <script setup>
+//基础地图功能
 import Map from 'ol/Map.js'
 import View from 'ol/View.js'
 import TileLayer from 'ol/layer/Tile.js'
@@ -9,6 +10,17 @@ import Zoom from 'ol/control/Zoom.js'
 import ZoomSlider from 'ol/control/ZoomSlider.js'
 import ZoomToExtent from 'ol/control/ZoomToExtent.js'
 import ScaleLine from 'ol/control/ScaleLine.js'
+//绘制用
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import Feature from 'ol/Feature'
+import Point from 'ol/geom/Point'
+import MultiPoint from 'ol/geom/MultiPoint'
+import LineString from 'ol/geom/LineString'
+import MultiLineString from 'ol/geom/MultiLineString'
+import Polygon from 'ol/geom/Polygon'
+import MultiPolygon from 'ol/geom/MultiPolygon'
+import { Fill, Stroke, Circle, Style } from 'ol/style'
 
 import { ref } from 'vue'
 import { onMounted } from 'vue'
@@ -27,14 +39,10 @@ onMounted(() => {
   // 用传入的view配置覆盖默认配置
   const viewOpts = Object.assign(
     {
-      projection: 'EPSG:3857',
-
-      // 地大全貌
-      // center: [12758417.315499168, 3562866.9013162893],
-      // zoom: 16.5,
+      projection: 'EPSG:4326',
 
       // 地大中心
-      center: [12758612.973162018, 3562849.0216611675],
+      center: [114.31667, 30.51667],
       zoom: 17.5
     },
     props.viewConf
@@ -216,6 +224,7 @@ const onCheckChange = () => {
 //地图跳转
 export default {
   methods: {
+    //地图跳转部分
     movePublicMap() {
       this.$router.push({ path: '/publicMap' })
     },
@@ -224,6 +233,192 @@ export default {
     },
     moveOSMap() {
       this.$router.push({ path: '/OSMap' })
+    },
+    upLoadJSON() {
+      this.$refs.fileRef.dispatchEvent(new MouseEvent('click')) //弹出选择本地文件
+    },
+    //读取JSON并绘制部分
+    handleFileUpload(event) {
+      // 处理文件上传逻辑
+      const file = event.target.files[0]
+      this.ReadAndWrite(file)
+    },
+    ReadAndWrite(file) {
+      const extension = file.name.split('.').pop().toLowerCase()
+      if (extension !== 'json') return
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const fileData = event.target.result
+        try {
+          const jsonData = JSON.parse(fileData)
+          this.drawJSON(jsonData)
+        } catch (error) {
+          console.error('解析 JSON 数据时出错:', error)
+        }
+      }
+      reader.onerror = (error) => {
+        console.error('读取文件时出错:', error)
+      }
+      reader.readAsText(file)
+    },
+    drawJSON(jsonData) {
+      // const parsedData = jsonData
+      // let pointFeature = []
+      // let MultiPointFeature = []
+      // let LineStringFeature = []
+      // let MultiLineStringFeature = []
+      // let PolygonFeature = []
+      // let MultiPolygonFeature = []
+      // let test = null
+      // //点格式
+      // const PointStyle = new Style({
+      //   image: new Circle({
+      //     radius: 10, // 半径
+      //     fill: new Fill({ color: 'red' }), // 填充色
+      //     stroke: new Stroke({ color: 'yellow' }) // 边框
+      //   })
+      // })
+      // //线格式
+      // const LineStyle = new Style({
+      //   stroke: new Stroke({ color: 'blue', width: 10 })
+      // })
+      // //面格式
+      // const PolygonStyle = new Style({
+      //   fill: new Fill({ color: 'blue' })
+      // })
+
+      // // 检查数据类型是否为 FeatureCollection,并读取数据
+      // if (parsedData.type === 'FeatureCollection') {
+      //   const features = parsedData.features
+      //   // 遍历每个 Feature
+      //   features.forEach((feature) => {
+      //     console.log(feature)
+      //     if (feature.type === 'Feature') {
+      //       const geometry = feature.geometry
+      //       const coordinates = geometry.coordinates
+      //       console.log(coordinates)
+      //       // 提取几何类型和坐标信息
+      //       const geometryType = geometry.type
+      //       switch (geometryType) {
+      //         case 'Point':
+      //           coordinates.forEach((coordinate) => {
+      //             const thisPointFeature = new Feature(new Point(coordinate))
+      //             pointFeature.push(thisPointFeature)
+      //           })
+      //           break
+      //         case 'MultiPoint':
+      //           coordinates.forEach((coordinate) => {
+      //             const thisMultiPointFeature = new Feature(new MultiPoint(coordinate))
+      //             MultiPointFeature.push(thisMultiPointFeature)
+      //           })
+      //           break
+      //         case 'LineString':
+      //           coordinates.forEach((coordinate) => {
+      //             const thisLineString = new Feature(new LineString(coordinate))
+      //             LineStringFeature.push(thisLineString)
+      //           })
+      //           break
+      //         case 'MultiLineString':
+      //           coordinates.forEach((coordinate) => {
+      //             const thisMultiLineString = new Feature(new MultiLineString(coordinate))
+      //             LineString.push(thisMultiLineString)
+      //           })
+      //           break
+      //         case 'Polygon':
+      //           coordinates.forEach((coordinate) => {
+      //             const thisPolygon = new Feature(new Polygon(coordinate))
+      //             PolygonFeature.push(thisPolygon)
+      //           })
+      //           break
+      //         case 'MultiPolygon':
+      //           coordinates.forEach((coordinate) => {
+      //             console.log(coordinate)
+      //             const Mpl = new VectorLayer({
+      //               source: new VectorSource({
+      //                 features: [new Feature(new MultiPolygon(coordinate))]
+      //               }),
+      //               PolygonStyle
+      //             })
+      //             test = Mpl
+      //           })
+      //           break
+      //         default:
+      //           break
+      //       }
+      //     }
+      //   })
+      // }
+
+      // //点集
+      // const PointLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: pointFeature
+      //   }),
+      //   PointStyle
+      // })
+      // const MultiPointLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: MultiPointFeature
+      //   }),
+      //   PointStyle
+      // })
+      // //线集
+      // const LineLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: LineStringFeature
+      //   }),
+      //   LineStyle
+      // })
+      // const MultiLineStringLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: MultiLineStringFeature
+      //   }),
+      //   LineStyle
+      // })
+
+      // //面集
+      // const PolygonLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: PolygonFeature
+      //   }),
+      //   PolygonStyle
+      // })
+      // const MultiPolygonLayer = new VectorLayer({
+      //   source: new VectorSource({
+      //     features: MultiPolygonFeature
+      //   }),
+      //   PolygonStyle
+      // })
+
+      let mainMap = null
+      setTimeout(() => {
+        mainMap = window.map
+        // mainMap.addLayer(PointLayer)
+        // mainMap.addLayer(MultiPointLayer)
+        // mainMap.addLayer(LineLayer)
+        // mainMap.addLayer(MultiLineStringLayer)
+        // mainMap.addLayer(PolygonLayer)
+        // mainMap.addLayer(MultiPolygonLayer)
+        // mainMap.addLayer(test)
+      }, 1000)
+
+      const lineCoor = [
+        [114.31667, 30.51667],
+        [115.31667, 31.51667]
+      ]
+      const style = new Style({
+        stroke: new Stroke({ color: 'blue', width: 10 })
+      })
+
+      // 创建一个点Feature对象
+      const lineFeature = new Feature(new LineString(lineCoor))
+      const vectorLayer = new VectorLayer({
+        source: new VectorSource({
+          features: [lineFeature]
+        }),
+        style
+      })
+      mainMap.addLayer(vectorLayer)
     }
   }
 }
@@ -231,6 +426,7 @@ export default {
 
 <template>
   <div id="mapDom" class="map"></div>
+  <input v-show="false" ref="fileRef" type="file" @change="handleFileUpload" />
   <div class="control">
     <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
     <el-button @click="onRestore('bar')">复位</el-button>
@@ -239,6 +435,7 @@ export default {
     <el-button @click="movePublicMap()">公开地图</el-button>
     <el-button @click="moveOGCMap()">OGC地图</el-button>
     <el-button @click="moveOSMap()">开源地图</el-button>
+    <el-button @click="upLoadJSON()">上传JSON</el-button>
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
@@ -274,7 +471,7 @@ export default {
 .layerControl {
   position: absolute;
   right: 5px;
-  top: 10px;
+  bottom: 10px;
   width: 400px;
 }
 </style>

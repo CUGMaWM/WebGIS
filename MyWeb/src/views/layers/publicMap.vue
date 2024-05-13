@@ -8,7 +8,7 @@ import BingMaps from 'ol/source/BingMaps.js'
 import TileImage from 'ol/source/TileImage.js'
 import TileGrid from 'ol/tilegrid/TileGrid.js'
 
-import Map from 'src/views/webMap.vue'
+import Map from '../webMap.vue'
 
 // 1-创建天地图
 const createLyrTian = () => {

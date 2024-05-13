@@ -11,7 +11,7 @@ import GPX from 'ol/format/GPX.js'
 import MVT from 'ol/format/MVT.js'
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js'
 
-import Map from '../Map.vue'
+import Map from '../webMap.vue'
 
 // 1-创建图层，接入WMS服务
 const createLyrGeoJSON = () => {
