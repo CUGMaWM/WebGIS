@@ -172,7 +172,7 @@ setTimeout(() => {
 const onMoveWh = () => {
   view = window.map.getView()
   if (!view) return
-  view.setCenter([12758612.973162018, 3562849.0216611675])
+  view.setCenter([114.31667, 30.51667])
   view.setZoom(12)
 }
 // 复位
@@ -237,9 +237,13 @@ export default {
     upLoadJSON() {
       this.$refs.fileRef.dispatchEvent(new MouseEvent('click')) //弹出选择本地文件
     },
+    goLine() {
+      this.$router.push({ path: '/calLine' })
+    },
     //读取JSON并绘制部分
     handleFileUpload(event) {
       // 处理文件上传逻辑
+      window.map.removeLayer
       const file = event.target.files[0]
       this.ReadAndWrite(file)
     },
@@ -262,163 +266,132 @@ export default {
       reader.readAsText(file)
     },
     drawJSON(jsonData) {
-      // const parsedData = jsonData
-      // let pointFeature = []
-      // let MultiPointFeature = []
-      // let LineStringFeature = []
-      // let MultiLineStringFeature = []
-      // let PolygonFeature = []
-      // let MultiPolygonFeature = []
-      // let test = null
-      // //点格式
-      // const PointStyle = new Style({
-      //   image: new Circle({
-      //     radius: 10, // 半径
-      //     fill: new Fill({ color: 'red' }), // 填充色
-      //     stroke: new Stroke({ color: 'yellow' }) // 边框
-      //   })
-      // })
-      // //线格式
-      // const LineStyle = new Style({
-      //   stroke: new Stroke({ color: 'blue', width: 10 })
-      // })
-      // //面格式
-      // const PolygonStyle = new Style({
-      //   fill: new Fill({ color: 'blue' })
-      // })
-
-      // // 检查数据类型是否为 FeatureCollection,并读取数据
-      // if (parsedData.type === 'FeatureCollection') {
-      //   const features = parsedData.features
-      //   // 遍历每个 Feature
-      //   features.forEach((feature) => {
-      //     console.log(feature)
-      //     if (feature.type === 'Feature') {
-      //       const geometry = feature.geometry
-      //       const coordinates = geometry.coordinates
-      //       console.log(coordinates)
-      //       // 提取几何类型和坐标信息
-      //       const geometryType = geometry.type
-      //       switch (geometryType) {
-      //         case 'Point':
-      //           coordinates.forEach((coordinate) => {
-      //             const thisPointFeature = new Feature(new Point(coordinate))
-      //             pointFeature.push(thisPointFeature)
-      //           })
-      //           break
-      //         case 'MultiPoint':
-      //           coordinates.forEach((coordinate) => {
-      //             const thisMultiPointFeature = new Feature(new MultiPoint(coordinate))
-      //             MultiPointFeature.push(thisMultiPointFeature)
-      //           })
-      //           break
-      //         case 'LineString':
-      //           coordinates.forEach((coordinate) => {
-      //             const thisLineString = new Feature(new LineString(coordinate))
-      //             LineStringFeature.push(thisLineString)
-      //           })
-      //           break
-      //         case 'MultiLineString':
-      //           coordinates.forEach((coordinate) => {
-      //             const thisMultiLineString = new Feature(new MultiLineString(coordinate))
-      //             LineString.push(thisMultiLineString)
-      //           })
-      //           break
-      //         case 'Polygon':
-      //           coordinates.forEach((coordinate) => {
-      //             const thisPolygon = new Feature(new Polygon(coordinate))
-      //             PolygonFeature.push(thisPolygon)
-      //           })
-      //           break
-      //         case 'MultiPolygon':
-      //           coordinates.forEach((coordinate) => {
-      //             console.log(coordinate)
-      //             const Mpl = new VectorLayer({
-      //               source: new VectorSource({
-      //                 features: [new Feature(new MultiPolygon(coordinate))]
-      //               }),
-      //               PolygonStyle
-      //             })
-      //             test = Mpl
-      //           })
-      //           break
-      //         default:
-      //           break
-      //       }
-      //     }
-      //   })
-      // }
-
-      // //点集
-      // const PointLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: pointFeature
-      //   }),
-      //   PointStyle
-      // })
-      // const MultiPointLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: MultiPointFeature
-      //   }),
-      //   PointStyle
-      // })
-      // //线集
-      // const LineLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: LineStringFeature
-      //   }),
-      //   LineStyle
-      // })
-      // const MultiLineStringLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: MultiLineStringFeature
-      //   }),
-      //   LineStyle
-      // })
-
-      // //面集
-      // const PolygonLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: PolygonFeature
-      //   }),
-      //   PolygonStyle
-      // })
-      // const MultiPolygonLayer = new VectorLayer({
-      //   source: new VectorSource({
-      //     features: MultiPolygonFeature
-      //   }),
-      //   PolygonStyle
-      // })
-
-      let mainMap = null
-      setTimeout(() => {
-        mainMap = window.map
-        // mainMap.addLayer(PointLayer)
-        // mainMap.addLayer(MultiPointLayer)
-        // mainMap.addLayer(LineLayer)
-        // mainMap.addLayer(MultiLineStringLayer)
-        // mainMap.addLayer(PolygonLayer)
-        // mainMap.addLayer(MultiPolygonLayer)
-        // mainMap.addLayer(test)
-      }, 1000)
-
-      const lineCoor = [
-        [114.31667, 30.51667],
-        [115.31667, 31.51667]
-      ]
-      const style = new Style({
+      const parsedData = jsonData
+      //点格式
+      const PointStyle = new Style({
+        image: new Circle({
+          radius: 10, // 半径
+          fill: new Fill({ color: 'red' }), // 填充色
+          stroke: new Stroke({ color: 'yellow' }) // 边框
+        })
+      })
+      //线格式
+      const LineStyle = new Style({
         stroke: new Stroke({ color: 'blue', width: 10 })
       })
-
-      // 创建一个点Feature对象
-      const lineFeature = new Feature(new LineString(lineCoor))
-      const vectorLayer = new VectorLayer({
-        source: new VectorSource({
-          features: [lineFeature]
-        }),
-        style
+      //面格式
+      const PolygonStyle = new Style({
+        fill: new Fill({ color: 'blue' })
       })
-      mainMap.addLayer(vectorLayer)
+
+      let mainMap = null
+      // 检查数据类型是否为 FeatureCollection,并读取数据
+      setTimeout(() => {
+        mainMap = window.map
+
+        if (parsedData.type === 'FeatureCollection') {
+          const features = parsedData.features
+          // 遍历每个 Feature
+          features.forEach((feature) => {
+            console.log(feature)
+            if (feature.type === 'Feature') {
+              const geometry = feature.geometry
+              const coordinates = geometry.coordinates
+              console.log(coordinates)
+              // 提取几何类型和坐标信息
+              const geometryType = geometry.type
+              switch (geometryType) {
+                case 'Point':
+                  coordinates.forEach((coordinate) => {
+                    const PointCoordinates = [coordinate] // 将单个坐标包装在二维数组中
+                    const thisPointFeature = new Feature(new Point(PointCoordinates))
+                    const PointLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisPointFeature]
+                      }),
+                      style: PointStyle
+                    })
+                    mainMap.addLayer(PointLayer)
+                  })
+                  break
+
+                case 'MultiPoint':
+                  coordinates.forEach((coordinate) => {
+                    const MultiPointCoordinates = [coordinate]
+                    const thisMultiPointFeature = new Feature(new MultiPoint(MultiPointCoordinates))
+                    const MultiPointLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisMultiPointFeature]
+                      }),
+                      style: PointStyle
+                    })
+                    mainMap.addLayer(MultiPointLayer)
+                  })
+                  break
+
+                case 'LineString':
+                  coordinates.forEach((coordinate) => {
+                    const LineCoordinates = [coordinate]
+                    const thisLineString = new Feature(new LineString(LineCoordinates))
+                    const LineStringLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisLineString]
+                      }),
+                      style: LineStyle
+                    })
+                    mainMap.addLayer(LineStringLayer)
+                  })
+                  break
+
+                case 'MultiLineString':
+                  coordinates.forEach((coordinate) => {
+                    const MLCoordinates = [coordinate]
+                    const thisMultiLineString = new Feature(new MultiLineString(MLCoordinates))
+                    const MultiLineStringLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisMultiLineString]
+                      }),
+                      style: LineStyle
+                    })
+                    mainMap.addLayer(MultiLineStringLayer)
+                  })
+                  break
+
+                case 'Polygon':
+                  coordinates.forEach((coordinate) => {
+                    const polygonCoordinates = [coordinate] // 将单个坐标包装在二维数组中
+                    const thisPolygon = new Feature(new Polygon(polygonCoordinates))
+                    const PolygonLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisPolygon]
+                      }),
+                      style: PolygonStyle
+                    })
+                    mainMap.addLayer(PolygonLayer)
+                  })
+                  break
+
+                case 'MultiPolygon':
+                  coordinates.forEach((coordinate) => {
+                    const MPCoordinates = [coordinate]
+                    const thisMultiPolygon = new Feature(new MultiPolygon(MPCoordinates))
+                    const MultiPolygonLayer = new VectorLayer({
+                      source: new VectorSource({
+                        features: [thisMultiPolygon]
+                      }),
+                      style: PolygonStyle
+                    })
+                    mainMap.addLayer(MultiPolygonLayer)
+                  })
+                  break
+
+                default:
+                  break
+              }
+            }
+          })
+        }
+      }, 1000)
     }
   }
 }
@@ -436,6 +409,7 @@ export default {
     <el-button @click="moveOGCMap()">OGC地图</el-button>
     <el-button @click="moveOSMap()">开源地图</el-button>
     <el-button @click="upLoadJSON()">上传JSON</el-button>
+    <el-button @click="goLine()">量测功能</el-button>
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">

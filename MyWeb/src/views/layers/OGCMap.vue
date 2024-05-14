@@ -23,7 +23,7 @@ const createLyrWMS = () => {
     properties: {
       name: 'wms',
       title: 'WMS服务',
-      locate: [-11853698.36373101, 4522979.57274383, 4]
+      locate: [114.31667, 30.51667, 4]
     },
     visible: false,
     source: new TileWMS({
@@ -81,7 +81,7 @@ const createLyrWFS = () => {
     properties: {
       name: 'wfs',
       title: 'WFS服务',
-      locate: [-11534858.696299767, 5493787.393992992, 7]
+      locate: [114.31667, 30.51667, 7]
     },
     visible: false,
     source: new VectorSource({
@@ -91,10 +91,10 @@ const createLyrWFS = () => {
           url +
           '?service=WFS&' +
           'version=1.0.0&request=GetFeature&typename=sf:roads&' +
-          'outputFormat=application/json&srsname=EPSG:3857&' +
+          'outputFormat=application/json&srsname=EPSG:4326&' +
           'bbox=' +
           extent.join(',') +
-          ',EPSG:3857'
+          ',EPSG:4326'
         )
       },
       strategy: bboxStrategy

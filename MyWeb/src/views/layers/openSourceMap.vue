@@ -19,14 +19,14 @@ const createLyrGeoJSON = () => {
     properties: {
       name: 'geojson',
       title: 'GeoJSON数据',
-      locate: [12758643.216901623, 3562584.420464834, 16]
+      locate: [114.31667, 30.51667, 16]
     },
     visible: false,
     source: new VectorSource({
       url: 'data/lines.json',
       format: new GeoJSON({
         dataProjection: 'EPSG:4326',
-        featureProjection: 'EPSG:3857'
+        featureProjection: 'EPSG:4326'
       })
     }),
     style: new Style({
@@ -43,7 +43,7 @@ const createLyrKML = () => {
     properties: {
       name: 'kml',
       title: 'KML数据',
-      locate: [864510.0253082548, 5862753.416073311, 10]
+      locate: [114.31667, 30.51667, 10]
     },
     visible: false,
     source: new VectorSource({
@@ -85,7 +85,7 @@ const createLyrGPX = () => {
     properties: {
       name: 'gpx',
       title: 'GPX数据',
-      locate: [-7916212.305874971, 5228516.283875127, 14]
+      locate: [114.31667, 30.51667, 14]
     },
     visible: false,
     source: new VectorSource({
@@ -103,7 +103,7 @@ const createLyrVecTile = () => {
     properties: {
       name: 'vectortile',
       title: '矢量瓦片数据',
-      locate: [864510.0253082548, 5862753.416073311, 10]
+      locate: [114.31667, 30.51667, 10]
     },
     visible: false,
     source: new VectorTileSource({

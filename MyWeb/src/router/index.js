@@ -21,14 +21,27 @@ const routes = [
     path: '/OSMap',
     name: 'OSMap',
     component: () => import('../views/layers/openSourceMap.vue')
+  },
+  {
+    path: '/calArea',
+    name: 'calArea',
+    component: () => import('../views/layers/calArea.vue')
+  },
+  {
+    path: '/calLine',
+    name: 'calLine',
+    component: () => import('../views/layers/calLine.vue')
+  },
+  {
+    path: '/',
+    redirect: '/webMap'
   }
 ]
 
 // 构造路由对象
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes,
-  redirect: '/webMap'
+  routes: routes
 })
 
 export default router
