@@ -392,6 +392,12 @@ export default {
           })
         }
       }, 1000)
+    },
+    goNav() {
+      var newWindow = window.open('/config/navigate.html')
+      newWindow.onload = function () {
+        window.close()
+      }
     }
   }
 }
@@ -410,6 +416,7 @@ export default {
     <el-button @click="moveOSMap()">开源地图</el-button>
     <el-button @click="upLoadJSON()">上传JSON</el-button>
     <el-button @click="goLine()">量测功能</el-button>
+    <el-button @click="goNav()">导航模块</el-button>
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
