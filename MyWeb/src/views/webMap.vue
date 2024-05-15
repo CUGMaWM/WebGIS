@@ -42,7 +42,7 @@ onMounted(() => {
       projection: 'EPSG:4326',
 
       // 地大中心
-      center: [114.31667, 30.51667],
+      center: [114.61296, 30.46099],
       zoom: 17.5
     },
     props.viewConf
@@ -234,16 +234,16 @@ export default {
     moveOSMap() {
       this.$router.push({ path: '/OSMap' })
     },
-    upLoadJSON() {
-      this.$refs.fileRef.dispatchEvent(new MouseEvent('click')) //弹出选择本地文件
-    },
     goLine() {
       this.$router.push({ path: '/calLine' })
+    },
+    upLoadJSON() {
+      this.$refs.fileRef.dispatchEvent(new MouseEvent('click')) //弹出选择本地文件
     },
     //读取JSON并绘制部分
     handleFileUpload(event) {
       // 处理文件上传逻辑
-      window.map.removeLayer
+      window.map.removeLayer()
       const file = event.target.files[0]
       this.ReadAndWrite(file)
     },
@@ -398,6 +398,9 @@ export default {
       newWindow.onload = function () {
         window.close()
       }
+    },
+    goAna() {
+      this.$router.push({ path: '/heatMap' })
     }
   }
 }
@@ -417,6 +420,7 @@ export default {
     <el-button @click="upLoadJSON()">上传JSON</el-button>
     <el-button @click="goLine()">量测功能</el-button>
     <el-button @click="goNav()">导航模块</el-button>
+    <el-button @click="goAna()">空间分析</el-button>
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
@@ -452,7 +456,7 @@ export default {
 .layerControl {
   position: absolute;
   right: 5px;
-  bottom: 10px;
+  bottom: 500px;
   width: 400px;
 }
 </style>

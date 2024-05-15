@@ -35,6 +35,11 @@ const routes = [
   {
     path: '/',
     redirect: '/webMap'
+  },
+  {
+    path: '/heatMap',
+    name: 'heatMap',
+    component: () => import('../views/layers/SpatialAnalyse/heatMap.vue')
   }
 ]
 
