@@ -47,7 +47,7 @@ export default {
       this.map.addLayer(this.vectorLayer)
     },
     startDrawing() {
-      this.drawing = true
+      this.drawing = !this.drawing
       this.lineCoords = []
       this.polygonFeature = null
 

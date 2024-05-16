@@ -40,6 +40,11 @@ const routes = [
     path: '/heatMap',
     name: 'heatMap',
     component: () => import('../views/layers/SpatialAnalyse/heatMap.vue')
+  },
+  {
+    path: '/mapMark',
+    name: 'mapMark',
+    component: () => import('../views/layers/SpatialAnalyse/mapMark.vue')
   }
 ]
 

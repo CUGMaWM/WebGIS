@@ -102,7 +102,10 @@ export default {
       // 处理文件上传逻辑
       const file = event.target.files[0]
       const extension = file.name.split('.').pop().toLowerCase()
-      if (extension !== 'json') return
+      if (!(extension == 'json' || extension == 'js')) {
+        alert('文件格式不正确(json/js)!')
+        return
+      }
       const reader = new FileReader()
       reader.onload = (event) => {
         const fileData = event.target.result

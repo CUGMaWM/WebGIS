@@ -42,7 +42,7 @@ export default {
       this.map = map
     },
     startDrawing() {
-      this.drawing = true
+      this.drawing = !this.drawing
       this.lineCoords = []
       this.lineFeature = null
 

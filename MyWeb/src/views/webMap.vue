@@ -249,7 +249,10 @@ export default {
     },
     ReadAndWrite(file) {
       const extension = file.name.split('.').pop().toLowerCase()
-      if (extension !== 'json') return
+      if (!(extension == 'json' || extension == 'js')) {
+        alert('文件格式不正确(json/js)!')
+        return
+      }
       const reader = new FileReader()
       reader.onload = (event) => {
         const fileData = event.target.result
@@ -401,6 +404,9 @@ export default {
     },
     goAna() {
       this.$router.push({ path: '/heatMap' })
+    },
+    goMark() {
+      this.$router.push({ path: '/mapMark' })
     }
   }
 }
@@ -421,6 +427,7 @@ export default {
     <el-button @click="goLine()">量测功能</el-button>
     <el-button @click="goNav()">导航模块</el-button>
     <el-button @click="goAna()">空间分析</el-button>
+    <el-button @click="goMark()">地图标注</el-button>
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
