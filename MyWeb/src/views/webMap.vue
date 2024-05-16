@@ -28,7 +28,7 @@ import { onMounted } from 'vue'
 // 1-定义外部参数
 const props = defineProps({
   viewConf: { type: Object, default: () => ({}) },
-  defLyrs: { type: Array, default: () => ['vec_c'] }
+  defLyrs: { type: Array, default: () => ['vec_c', 'img_c'] }
 })
 
 // 2-定义地图创建完毕的事件
@@ -113,7 +113,7 @@ onMounted(() => {
   map.addControl(control)
 
   //2.地图鹰眼
-  const baseLayer = map.getLayers().item(0)
+  const baseLayer = map.getLayers().item(1)
   // 创建鹰眼控件
   const miniMap = new OverviewMap({
     collapsed: false,
@@ -198,10 +198,25 @@ const onScaleChange = (type) => {
 
 //5.图层切换
 const checks = ref([])
-
+let olmap = null
+let layers = []
+const createLayerManage = () => {
+  olmap = mainMap
+  layers = mainMap
+    .getLayers()
+    .getArray()
+    .map((layer) => {
+      checks.value.push(layer.get('name'))
+      return {
+        name: layer.get('name'),
+        title: layer.get('title'),
+        layer
+      }
+    })
+}
 // 图层开关控制
 const onCheckChange = () => {
-  let olmap = mainMap
+  olmap = mainMap
   if (!olmap) return
   let layers = mainMap
     .getLayers()
@@ -243,7 +258,8 @@ export default {
     //读取JSON并绘制部分
     handleFileUpload(event) {
       // 处理文件上传逻辑
-      window.map.removeLayer()
+      this.clearLayers()
+
       const file = event.target.files[0]
       this.ReadAndWrite(file)
     },
@@ -258,7 +274,7 @@ export default {
         const fileData = event.target.result
         try {
           const jsonData = JSON.parse(fileData)
-          this.drawJSON(jsonData)
+          this.parseJSON(jsonData)
         } catch (error) {
           console.error('解析 JSON 数据时出错:', error)
         }
@@ -268,8 +284,37 @@ export default {
       }
       reader.readAsText(file)
     },
-    drawJSON(jsonData) {
+    parseJSON(jsonData) {
       const parsedData = jsonData
+      let mainMap = null
+      // 检查数据类型是否为 FeatureCollection,并读取数据
+      setTimeout(() => {
+        mainMap = window.map
+        if (parsedData.type == 'FeatureCollection') {
+          const features = parsedData.features
+          // 遍历每个 Feature
+          features.forEach((feature) => {
+            if (feature.type == 'Feature') {
+              const geometry = feature.geometry
+              if (geometry.type == 'GeometryCollection') {
+                geometry.geometries.forEach((geometry) => {
+                  const coordinates = geometry.coordinates
+                  // 提取几何类型和坐标信息
+                  const geometryType = geometry.type
+                  this.drawFeatures(geometryType, coordinates, mainMap)
+                })
+              } else {
+                const coordinates = geometry.coordinates
+                // 提取几何类型和坐标信息
+                const geometryType = geometry.type
+                this.drawFeatures(geometryType, coordinates, mainMap)
+              }
+            }
+          })
+        }
+      }, 1000)
+    },
+    drawFeatures(geometryType, coordinates, mainMap) {
       //点格式
       const PointStyle = new Style({
         image: new Circle({
@@ -286,115 +331,93 @@ export default {
       const PolygonStyle = new Style({
         fill: new Fill({ color: 'blue' })
       })
+      switch (geometryType) {
+        case 'Point':
+          {
+            const thisPointFeature = new Feature(new Point(coordinates))
+            const PointLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisPointFeature]
+              }),
+              style: PointStyle
+            })
+            mainMap.addLayer(PointLayer)
+          }
+          break
 
-      let mainMap = null
-      // 检查数据类型是否为 FeatureCollection,并读取数据
-      setTimeout(() => {
-        mainMap = window.map
-
-        if (parsedData.type === 'FeatureCollection') {
-          const features = parsedData.features
-          // 遍历每个 Feature
-          features.forEach((feature) => {
-            console.log(feature)
-            if (feature.type === 'Feature') {
-              const geometry = feature.geometry
-              const coordinates = geometry.coordinates
-              console.log(coordinates)
-              // 提取几何类型和坐标信息
-              const geometryType = geometry.type
-              switch (geometryType) {
-                case 'Point':
-                  coordinates.forEach((coordinate) => {
-                    const PointCoordinates = [coordinate] // 将单个坐标包装在二维数组中
-                    const thisPointFeature = new Feature(new Point(PointCoordinates))
-                    const PointLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisPointFeature]
-                      }),
-                      style: PointStyle
-                    })
-                    mainMap.addLayer(PointLayer)
-                  })
-                  break
-
-                case 'MultiPoint':
-                  coordinates.forEach((coordinate) => {
-                    const MultiPointCoordinates = [coordinate]
-                    const thisMultiPointFeature = new Feature(new MultiPoint(MultiPointCoordinates))
-                    const MultiPointLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisMultiPointFeature]
-                      }),
-                      style: PointStyle
-                    })
-                    mainMap.addLayer(MultiPointLayer)
-                  })
-                  break
-
-                case 'LineString':
-                  coordinates.forEach((coordinate) => {
-                    const LineCoordinates = [coordinate]
-                    const thisLineString = new Feature(new LineString(LineCoordinates))
-                    const LineStringLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisLineString]
-                      }),
-                      style: LineStyle
-                    })
-                    mainMap.addLayer(LineStringLayer)
-                  })
-                  break
-
-                case 'MultiLineString':
-                  coordinates.forEach((coordinate) => {
-                    const MLCoordinates = [coordinate]
-                    const thisMultiLineString = new Feature(new MultiLineString(MLCoordinates))
-                    const MultiLineStringLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisMultiLineString]
-                      }),
-                      style: LineStyle
-                    })
-                    mainMap.addLayer(MultiLineStringLayer)
-                  })
-                  break
-
-                case 'Polygon':
-                  coordinates.forEach((coordinate) => {
-                    const polygonCoordinates = [coordinate] // 将单个坐标包装在二维数组中
-                    const thisPolygon = new Feature(new Polygon(polygonCoordinates))
-                    const PolygonLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisPolygon]
-                      }),
-                      style: PolygonStyle
-                    })
-                    mainMap.addLayer(PolygonLayer)
-                  })
-                  break
-
-                case 'MultiPolygon':
-                  coordinates.forEach((coordinate) => {
-                    const MPCoordinates = [coordinate]
-                    const thisMultiPolygon = new Feature(new MultiPolygon(MPCoordinates))
-                    const MultiPolygonLayer = new VectorLayer({
-                      source: new VectorSource({
-                        features: [thisMultiPolygon]
-                      }),
-                      style: PolygonStyle
-                    })
-                    mainMap.addLayer(MultiPolygonLayer)
-                  })
-                  break
-
-                default:
-                  break
-              }
-            }
+        case 'MultiPoint':
+          coordinates.forEach((coordinate) => {
+            const MultiPointCoordinates = [coordinate]
+            const thisMultiPointFeature = new Feature(new MultiPoint(MultiPointCoordinates))
+            const MultiPointLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisMultiPointFeature]
+              }),
+              style: PointStyle
+            })
+            mainMap.addLayer(MultiPointLayer)
           })
-        }
-      }, 1000)
+          break
+
+        case 'LineString':
+          coordinates.forEach((coordinate) => {
+            const LineCoordinates = [coordinate]
+            const thisLineString = new Feature(new LineString(LineCoordinates))
+            const LineStringLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisLineString]
+              }),
+              style: LineStyle
+            })
+            mainMap.addLayer(LineStringLayer)
+          })
+          break
+
+        case 'MultiLineString':
+          coordinates.forEach((coordinate) => {
+            const MLCoordinates = [coordinate]
+            const thisMultiLineString = new Feature(new MultiLineString(MLCoordinates))
+            const MultiLineStringLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisMultiLineString]
+              }),
+              style: LineStyle
+            })
+            mainMap.addLayer(MultiLineStringLayer)
+          })
+          break
+
+        case 'Polygon':
+          coordinates.forEach((coordinate) => {
+            const polygonCoordinates = [coordinate] // 将单个坐标包装在二维数组中
+            const thisPolygon = new Feature(new Polygon(polygonCoordinates))
+            const PolygonLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisPolygon]
+              }),
+              style: PolygonStyle
+            })
+            mainMap.addLayer(PolygonLayer)
+          })
+          break
+
+        case 'MultiPolygon':
+          coordinates.forEach((coordinate) => {
+            const MPCoordinates = [coordinate]
+            const thisMultiPolygon = new Feature(new MultiPolygon(MPCoordinates))
+            const MultiPolygonLayer = new VectorLayer({
+              source: new VectorSource({
+                features: [thisMultiPolygon]
+              }),
+              style: PolygonStyle
+            })
+            mainMap.addLayer(MultiPolygonLayer)
+          })
+          break
+
+        default:
+          break
+      }
     },
     goNav() {
       var newWindow = window.open('/config/navigate.html')
@@ -407,6 +430,16 @@ export default {
     },
     goMark() {
       this.$router.push({ path: '/mapMark' })
+    },
+    clearLayers() {
+      let t = 0
+      if (window.map == null) t = 100
+      setTimeout(() => {
+        const layers = window.map.getLayers()
+        while (layers.getLength() > 1) {
+          layers.pop()
+        }
+      }, t)
     }
   }
 }
@@ -431,9 +464,9 @@ export default {
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
-      <el-checkbox v-for="layer in layers" :key="layer.name" :label="layer.name">{{
-        layer.title
-      }}</el-checkbox>
+      <el-checkbox v-for="layer in layers" :key="layer.name" :label="layer.name">
+        {{ layer.title }}
+      </el-checkbox>
     </el-checkbox-group>
   </el-card>
 </template>
@@ -463,7 +496,7 @@ export default {
 .layerControl {
   position: absolute;
   right: 5px;
-  bottom: 500px;
+  top: 50px;
   width: 400px;
 }
 </style>

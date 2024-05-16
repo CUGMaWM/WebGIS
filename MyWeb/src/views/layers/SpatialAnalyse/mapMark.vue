@@ -36,35 +36,11 @@ function createMap() {
   )
   const layerOptions = [
     {
-      key: 'img_c',
-      title: '天地图影像',
-      option: {
-        projection: 'EPSG:4326',
-        url: `http://t{0-7}.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
       key: 'vec_c',
       title: '天地图',
       option: {
         projection: 'EPSG:4326',
         url: `http://t{0-7}.tianditu.gov.cn/vec_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
-      key: 'cva_c',
-      title: '天地图注记',
-      option: {
-        projection: 'EPSG:4326',
-        url: `http://t{0-7}.tianditu.gov.cn/cva_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
-      key: 'gaode',
-      title: '瓦片底图',
-      option: {
-        projection: 'EPSG:3857',
-        url: 'http://mapcdn.lshida.com/maps/vt?lyrs=m@292000000&hl=zh-CN&gl=cn&src=app&x={x}&y={y}&z={z}&s='
       }
     }
   ]
@@ -159,6 +135,17 @@ export default {
       this.lineCoords = []
       this.polygonFeature = null
       this.drawing = false
+      this.clearLayers()
+    },
+    clearLayers() {
+      let t = 0
+      if (window.map == null) t = 100
+      setTimeout(() => {
+        const layers = window.map.getLayers()
+        while (layers.getLength() > 1) {
+          layers.pop()
+        }
+      }, t)
     },
     exportPointsToJSON() {
       if (this.vectorLayerSet.length < 1) {
