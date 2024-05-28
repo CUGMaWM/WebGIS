@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Map from '../views/webMap.vue'
 
-// 构造路由表
 const routes = [
   {
     path: '/webMap',
@@ -34,6 +34,7 @@ const routes = [
   },
   {
     path: '/',
+<<<<<<< HEAD
     redirect: '/webMap'
   },
   {
@@ -49,6 +50,13 @@ const routes = [
 ]
 
 // 构造路由对象
+=======
+    name: 'Map',
+    component: Map
+  }
+]
+
+>>>>>>> parent of 4d3387b (修复了某人存在亲妈的BUG)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
