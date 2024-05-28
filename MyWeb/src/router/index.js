@@ -3,6 +3,7 @@ import Map from '../views/webMap.vue'
 
 const routes = [
   {
+<<<<<<< HEAD
     path: '/webMap',
     name: 'webMap',
     component: () => import('../views/webMap.vue')
@@ -51,6 +52,14 @@ const routes = [
 
 // 构造路由对象
 =======
+    name: 'Map',
+    component: Map
+  }
+]
+
+>>>>>>> parent of 4d3387b (修复了某人存在亲妈的BUG)
+=======
+    path: '/',
     name: 'Map',
     component: Map
   }
