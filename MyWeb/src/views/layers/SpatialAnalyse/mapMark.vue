@@ -131,11 +131,7 @@ export default {
     },
 
     clearDrawing() {
-      this.vectorLayer.getSource().clear()
-      this.lineCoords = []
-      this.polygonFeature = null
-      this.drawing = false
-      this.clearLayers()
+      location.reload()
     },
     clearLayers() {
       let t = 0
