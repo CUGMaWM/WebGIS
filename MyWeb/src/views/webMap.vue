@@ -146,6 +146,15 @@ onMounted(() => {
   // 控件添加到地图
   map.addControl(miniMap)
 
+  //4.比例尺
+  let scale = null
+  // 移除旧比例尺
+  scale && map.removeControl(scale)
+  // 创建新比例尺
+  scale = new ScaleLine('bar')
+  // 添加到地图
+  map.addControl(scale)
+
   // 3.5-创建完毕后触发事件
   window.map = map
   // 3.4-触发创建完毕的事件，传回地图实例对象
@@ -398,10 +407,10 @@ const onRestore = () => {
 }
 
 //4.响应比例尺控制条
-let scale = null
 const onScaleChange = (type) => {
   if (!window.map) return
   let olmap = window.map
+  let scale = null
   // 移除旧比例尺
   scale && olmap.removeControl(scale)
   // 创建新比例尺
@@ -650,6 +659,9 @@ export default {
     <el-button @click="onRestore('bar')">复位</el-button>
     <el-button @click="onScaleChange('line')">比例尺线</el-button>
     <el-button @click="onScaleChange('bar')">比例尺条</el-button>
+    <el-button @click="movePublicMap()">公开地图</el-button>
+    <el-button @click="moveOGCMap()">OGC地图</el-button>
+    <el-button @click="moveOSMap()">开源地图</el-button>
     <el-button @click="upLoadJSON()">上传JSON</el-button>
     <el-button @click="goLine()">量测功能</el-button>
     <el-button @click="goNav()">导航模块</el-button>
@@ -658,12 +670,7 @@ export default {
   </div>
   <el-card class="layerControl">
     <el-checkbox-group v-model="checks" @change="onCheckChange">
-      <el-checkbox
-        v-for="layer in layers"
-        :key="layer.name"
-        :label="layer.name"
-        :checked="index != 0"
-      >
+      <el-checkbox v-for="layer in layers" :key="layer.name" :label="layer.name">
         {{ layer.title }}
       </el-checkbox>
     </el-checkbox-group>
@@ -672,6 +679,9 @@ export default {
 
 <style>
 .map {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 }
@@ -692,7 +702,7 @@ export default {
 .layerControl {
   position: absolute;
   right: 5px;
-  top: 10px;
-  width: 480px;
+  top: 50px;
+  width: 400px;
 }
 </style>
