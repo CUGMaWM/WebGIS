@@ -97,7 +97,6 @@ onMounted(() => {
   const map = new Map({
     // 3.1-设置地图的dom容器
     target: 'mapDom',
-
     // 3.2-设置地图的视图配置，projection默认是EPSG:3857（Web墨卡托平面坐标系）
     view: new View(viewOpts),
 
@@ -125,7 +124,7 @@ onMounted(() => {
   map.addControl(control)
 
   //2.地图鹰眼
-  const baseLayer = map.getLayers().item(1)
+  const baseLayer = map.getLayers().item(1) //修改item参数可以改变鹰眼地图图层
   // 创建鹰眼控件
   const miniMap = new OverviewMap({
     collapsed: false,
@@ -200,7 +199,6 @@ const createOtherLayers = () => {
       })
     })
   }
-
   // 3-创建高德地图
   const createLyrGd = () => {
     return new TileLayer({
@@ -214,7 +212,6 @@ const createOtherLayers = () => {
       })
     })
   }
-
   // 4-创建OpenStreetMap地图
   const createLyrOSM = () => {
     return new TileLayer({
@@ -226,7 +223,6 @@ const createOtherLayers = () => {
       source: new OSM()
     })
   }
-
   // 5-创建Bing地图
   const createLyrBing = () => {
     // 你的key, 如AvehefmVM_surC2UyDjyO2T_EvSgRUA9Te3_9D_xxxxxxx
@@ -243,7 +239,6 @@ const createOtherLayers = () => {
       })
     })
   }
-
   // 6-创建Arcgis地图
   const createLyrArc = () => {
     return new TileLayer({
@@ -258,11 +253,18 @@ const createOtherLayers = () => {
       })
     })
   }
+  let map = window.map
+  map.addLayer(createLyrBd())
+  map.addLayer(createLyrGd())
+  map.addLayer(createLyrOSM())
+  map.addLayer(createLyrBing())
+  map.addLayer(createLyrArc())
+
   // 7-创建图层，接入WMS服务
   const createLyrWMS = () => {
     // 提示跨越时使用代理使用服务代理地址
-    const url = '/local/geoserver/nurc/wms'
-    // const url = 'http://localhost:8080/geoserver/nurc/wms'
+    //const url = '/local/geoserver/nurc/wms'
+    const url = 'http://localhost:8080/geoserver/wlc/wms'
     return new TileLayer({
       properties: {
         name: 'wms',
@@ -272,14 +274,13 @@ const createOtherLayers = () => {
       visible: false,
       source: new TileWMS({
         url: url,
-        params: { LAYERS: 'nurc:Img_Sample' },
+        params: { LAYERS: 'WEBGIS:用地类型' },
         projection: 'EPSG:4326',
         ratio: 1,
         serverType: 'geoserver'
       })
     })
   }
-
   // 8-创建图层，接入WMTS服务
   const createLyrWMTS = () => {
     // 1-构造分辨率序列
@@ -307,6 +308,7 @@ const createOtherLayers = () => {
       visible: false,
       source: new WMTS({
         url: `http://t{0-7}.tianditu.gov.cn/vec_c/wmts?tk=b387b606afd9c346236f767123461927`,
+        //url: 'http://localhost:8080/geoserver/wlc/gwc/demo/wlc:%E7%94%A8%E5%9C%B0%E7%B1%BB%E5%9E%8B?gridSet=EPSG:4326&format=image/jpeg',
         projection: 'EPSG:4326',
         tileGrid: tileGrid,
         crossOrigin: '*',
@@ -317,10 +319,9 @@ const createOtherLayers = () => {
       })
     })
   }
-
-  // 11-创建图层，接入WMS服务
+  // 11-创建图层，接入WFS服务
   const createLyrWFS = () => {
-    const url = '/local/geoserver/sf/ows'
+    //const url = '/local/geoserver/WEBGIS/ows'
     return new VectorLayer({
       properties: {
         name: 'wfs',
@@ -330,16 +331,8 @@ const createOtherLayers = () => {
       visible: false,
       source: new VectorSource({
         format: new GeoJSON(),
-        url: (extent) => {
-          return (
-            url +
-            '?service=WFS&' +
-            'version=1.0.0&request=GetFeature&typename=sf:roads&' +
-            'outputFormat=application/json&srsname=EPSG:4326&' +
-            'bbox=' +
-            extent.join(',') +
-            ',EPSG:4326'
-          )
+        url: () => {
+          return 'http://localhost:8080/geoserver/wlc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=wlc%3A%E7%94%A8%E5%9C%B0%E7%B1%BB%E5%9E%8B&maxFeatures=50&outputFormat=application%2Fjson'
         },
         strategy: bboxStrategy
       }),
@@ -350,13 +343,6 @@ const createOtherLayers = () => {
       }
     })
   }
-
-  let map = window.map
-  map.addLayer(createLyrBd())
-  map.addLayer(createLyrGd())
-  map.addLayer(createLyrOSM())
-  map.addLayer(createLyrBing())
-  map.addLayer(createLyrArc())
   map.addLayer(createLyrWMS())
   map.addLayer(createLyrWMTS())
   map.addLayer(createLyrWFS())
@@ -448,9 +434,11 @@ export default {
     goLine() {
       this.$router.push({ path: '/calLine' })
     },
+
     upLoadJSON() {
       this.$refs.fileRef.dispatchEvent(new MouseEvent('click')) //弹出选择本地文件
     },
+
     //读取JSON并绘制部分
     handleFileUpload(event) {
       // 处理文件上传逻辑
@@ -459,6 +447,7 @@ export default {
       const file = event.target.files[0]
       this.ReadAndWrite(file)
     },
+
     ReadAndWrite(file) {
       const extension = file.name.split('.').pop().toLowerCase()
       if (!(extension == 'json' || extension == 'js')) {
@@ -480,6 +469,7 @@ export default {
       }
       reader.readAsText(file)
     },
+
     parseJSON(jsonData) {
       const parsedData = jsonData
       let mainMap = null
@@ -510,6 +500,7 @@ export default {
         }
       }, 1000)
     },
+
     drawFeatures(geometryType, coordinates, mainMap) {
       //点格式
       const PointStyle = new Style({
@@ -632,7 +623,7 @@ export default {
       if (window.map == null) t = 100
       setTimeout(() => {
         const layers = window.map.getLayers()
-        while (layers.getLength() > 1) {
+        while (layers.getLength() > 10) {
           layers.pop()
         }
       }, t)
@@ -645,6 +636,7 @@ export default {
   <div id="mapDom" class="map"></div>
 
   <input v-show="false" ref="fileRef" type="file" @change="handleFileUpload" />
+
   <div class="control">
     <el-button @click="onMoveWh('bar')">移动到武汉</el-button>
     <el-button @click="onRestore('bar')">复位</el-button>

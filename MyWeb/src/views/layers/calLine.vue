@@ -23,6 +23,7 @@ export default {
   mounted() {
     this.initMap()
   },
+
   methods: {
     initMap() {
       const map = new Map({
@@ -41,6 +42,7 @@ export default {
       })
       this.map = map
     },
+
     startDrawing() {
       this.drawing = !this.drawing
       this.lineCoords = []
@@ -50,17 +52,15 @@ export default {
       this.map.on('pointermove', this.handlePointerMove)
       this.map.once('pointermove', this.handleFirstPointerMove)
     },
+
     handleMapClick(event) {
       if (!this.drawing) return
-
       const coords = event.coordinate
-      this.lineCoords.push(coords)
-
+      this.lineCoords.push(coords) //保存点击处坐标信息
       if (this.lineFeature) {
-        this.map.removeLayer(this.lineFeature)
+        this.map.removeLayer(this.lineFeature) //移除旧线段
       }
-
-      const lineGeom = new LineString(this.lineCoords)
+      const lineGeom = new LineString(this.lineCoords) //添加新线段
       this.lineFeature = new Feature({
         geometry: lineGeom
       })
@@ -82,6 +82,7 @@ export default {
 
       this.map.addLayer(vectorLayer)
     },
+
     handlePointerMove(event) {
       if (!this.drawing) return
 

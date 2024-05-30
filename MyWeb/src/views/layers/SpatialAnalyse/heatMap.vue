@@ -37,35 +37,11 @@ function createMap() {
   )
   const layerOptions = [
     {
-      key: 'img_c',
-      title: '天地图影像',
-      option: {
-        projection: 'EPSG:4326',
-        url: `http://t{0-7}.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
       key: 'vec_c',
       title: '天地图',
       option: {
         projection: 'EPSG:4326',
         url: `http://t{0-7}.tianditu.gov.cn/vec_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
-      key: 'cva_c',
-      title: '天地图注记',
-      option: {
-        projection: 'EPSG:4326',
-        url: `http://t{0-7}.tianditu.gov.cn/cva_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=b387b606afd9c346236f767123461927`
-      }
-    },
-    {
-      key: 'gaode',
-      title: '瓦片底图',
-      option: {
-        projection: 'EPSG:3857',
-        url: 'http://mapcdn.lshida.com/maps/vt?lyrs=m@292000000&hl=zh-CN&gl=cn&src=app&x={x}&y={y}&z={z}&s='
       }
     }
   ]
@@ -142,6 +118,7 @@ export default {
       }
       reader.readAsText(file)
     },
+
     makeHeatMap(heatData) {
       const vectorSource = new VectorSource({
         features: new GeoJSONFormat().readFeatures(heatData, {
@@ -158,6 +135,7 @@ export default {
       })
       window.map.addLayer(heatMap)
     },
+
     getFeaCenter(fea) {
       const extent = fea.getGeometry().getExtent()
       return [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2]
@@ -209,7 +187,6 @@ export default {
         }
         const overlay = window.map.getOverlayById('chart') // 使用 Overlay 的唯一标识符（overlayId）获取对应的 Overlay 实例
         if (overlay) {
-          console.log(1)
           window.map.removeOverlay(overlay) // 从地图中移除 Overlay
         }
       }, t)
