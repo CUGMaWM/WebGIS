@@ -114,15 +114,7 @@ export default {
       alert('折线段的总长度为: ' + totalLengthInMeters)
     },
     clearDrawing() {
-      this.map.getLayers().forEach((layer) => {
-        if (layer instanceof VectorLayer) {
-          this.map.removeLayer(layer)
-        }
-      })
-
-      this.lineCoords = []
-      this.lineFeature = null
-      this.drawing = false
+      location.reload()
     },
     goMain() {
       this.$router.push({ path: '/webMap' })

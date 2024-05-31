@@ -120,6 +120,7 @@ export default {
     },
 
     makeHeatMap(heatData) {
+      console.log(heatData)
       const vectorSource = new VectorSource({
         features: new GeoJSONFormat().readFeatures(heatData, {
           dataProjection: 'EPSG:4326',

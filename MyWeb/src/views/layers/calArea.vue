@@ -139,10 +139,7 @@ export default {
       this.drawing = false
     },
     clearDrawing() {
-      this.vectorLayer.getSource().clear()
-      this.lineCoords = []
-      this.polygonFeature = null
-      this.drawing = false
+      location.reload()
     },
     goMain() {
       this.$router.push({ path: '/webMap' })

@@ -505,7 +505,7 @@ export default {
       //点格式
       const PointStyle = new Style({
         image: new Circle({
-          radius: 10, // 半径
+          radius: 5, // 半径
           fill: new Fill({ color: 'red' }), // 填充色
           stroke: new Stroke({ color: 'yellow' }) // 边框
         })
@@ -547,17 +547,14 @@ export default {
           break
 
         case 'LineString':
-          coordinates.forEach((coordinate) => {
-            const LineCoordinates = [coordinate]
-            const thisLineString = new Feature(new LineString(LineCoordinates))
-            const LineStringLayer = new VectorLayer({
-              source: new VectorSource({
-                features: [thisLineString]
-              }),
-              style: LineStyle
-            })
-            mainMap.addLayer(LineStringLayer)
+          const thisLineString = new Feature(new LineString(coordinates))
+          const LineStringLayer = new VectorLayer({
+            source: new VectorSource({
+              features: [thisLineString]
+            }),
+            style: LineStyle
           })
+          mainMap.addLayer(LineStringLayer)
           break
 
         case 'MultiLineString':
